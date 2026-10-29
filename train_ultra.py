@@ -1,39 +1,7 @@
-﻿"""
-UltraTrader Training Script - Institutional-Grade RL Trading Agent
+"""Train an experimental SAC policy on synthetic market dynamics.
 
-Trains a Soft Actor-Critic (SAC) agent against a multi-agent market simulator
-with 30+ expert ensemble and risk-aware reward shaping.
-
-Key Upgrades:
-1. Multi-Agent Market Simulation
-   - Models retail (FOMO/panic), small funds, large institutions, market makers
-   - Generates realistic stateful flow dynamics (AR(1) processes)
-   - Liquidity stress events and market microstructure effects
-
-2. 30+ Expert Ensemble
-   - Technical/microstructure, macro/cross-asset, behavioral/flow experts
-   - Risk/portfolio construction and arbitrage/structural signals
-   - Consolidated into 60-dim feature vector per timestep
-
-3. Institutional Reward Function
-   - PROFIT_W (80×): Strongly reward profitability
-   - HOLD_W (40×): Bonus for conviction trades (profit WITH size)
-   - DD_W (50×): Penalize drawdown to maintain risk discipline
-   - LEV_W (2×): Penalize over-leverage
-   - Result: "Do nothing" is NOT optimal - must take GOOD risks
-
-4. SAC Hyperparameters Tuned for Prop-Desk Style
-   - Longer horizon (gamma=0.995) for multi-step planning
-   - Larger replay buffer (200k) for better sample efficiency
-   - Controlled entropy (ent_coef='auto_0.2') to avoid collapse
-   - Deeper networks (256×256) to model complex market dynamics
-
-Environment Variables:
-    ULTRA_STEPS: Total training timesteps (default: 20000)
-    ULTRA_SEED: Random seed for reproducibility (default: 123)
-
-Usage:
-    python train_ultra.py
+ULTRA_STEPS defaults to 20000; ULTRA_SEED defaults to 123.
+This simulator and its heuristic experts do not establish real-market performance.
 """
 import os
 import numpy as np
@@ -61,7 +29,7 @@ def main():
     env = make_env()
     eval_env = make_env()
 
-    # Institutional-grade SAC hyperparameters
+    # Experimental SAC hyperparameters
     model = SAC(
         policy="MlpPolicy",
         env=env,

@@ -1,4 +1,4 @@
-﻿import math
+import math
 import numpy as np
 import gymnasium as gym
 
@@ -185,8 +185,11 @@ class UltraTradingEnv(gym.Env):
         self._reset_state()
 
     def reset(self, *, seed=None, options=None):
+        super().reset(seed=seed)
         if seed is not None:
             self._rng = np.random.default_rng(seed)
+            self.market_sim._rng = np.random.default_rng(seed)
+            self.experts._rng = np.random.default_rng(seed)
         self._reset_state()
         self.market_sim.reset()  # Reset market simulator state
         return self._get_obs(), {}

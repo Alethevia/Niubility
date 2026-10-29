@@ -30,6 +30,7 @@ class UltraExpertEnsemble:
 
     def __init__(self):
         """Initialize the 30+ expert ensemble."""
+        self._rng = np.random.default_rng()
         self.num_experts = 30
         # Output dimensionality: each expert produces 2 floats on average
         self.output_dim = 60
@@ -108,13 +109,13 @@ class UltraExpertEnsemble:
 
         # Expert 7: Rates/FX Risk Sentiment Proxy
         # Models correlation with rates/FX stress (simulated)
-        rates_stress = np.tanh(-big_flow * 1.5 + np.random.randn() * 0.1)
-        fx_tension = abs(small_flow) * (1.0 + np.random.randn() * 0.05)
+        rates_stress = np.tanh(-big_flow * 1.5 + self._rng.standard_normal() * 0.1)
+        fx_tension = abs(small_flow) * (1.0 + self._rng.standard_normal() * 0.05)
         features.extend([rates_stress, fx_tension])
 
         # Expert 8: Commodities/Inflation Pressure
         # Tracks inflation-sensitive flows
-        commodity_pressure = retail_sent * 0.3 + big_flow * 0.7 + np.random.randn() * 0.05
+        commodity_pressure = retail_sent * 0.3 + big_flow * 0.7 + self._rng.standard_normal() * 0.05
         inflation_signal = np.clip(commodity_pressure, -1.0, 1.0)
         features.extend([commodity_pressure, inflation_signal])
 
@@ -198,7 +199,7 @@ class UltraExpertEnsemble:
 
         # Expert 20: Basis Spread Tension
         # Models futures-spot basis stress
-        basis_tension = (big_flow - small_flow) * 0.5 + np.random.randn() * 0.05
+        basis_tension = (big_flow - small_flow) * 0.5 + self._rng.standard_normal() * 0.05
         basis_signal = np.clip(basis_tension, -1.0, 1.0)
         features.extend([basis_tension, basis_signal])
 
@@ -270,7 +271,7 @@ class UltraExpertEnsemble:
 
         # If we have fewer than 60 features, pad with small noise
         if len(features_array) < self.output_dim:
-            padding = np.random.randn(self.output_dim - len(features_array)).astype(np.float32) * 0.01
+            padding = self._rng.standard_normal(self.output_dim - len(features_array)).astype(np.float32) * 0.01
             features_array = np.concatenate([features_array, padding])
 
         # If somehow we have more, truncate
